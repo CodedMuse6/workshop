@@ -10,7 +10,7 @@ export type WorkshopData = {
 }
 
 export type WorkshopContextType = {
-    formData : WorkshopData[];
+    formData : WorkshopData;
     updateFormData : (data : WorkshopData) => void;
     formStatus : boolean;
     toggleFormStatus : () => void;

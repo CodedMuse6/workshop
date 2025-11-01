@@ -1,9 +1,12 @@
-import {ReactNode, useState} from "react"
-import {FormContext, WorkshopData} from "./FormContext"
+import {useState} from "react";
+import type {ReactNode} from "react";
+import {FormContext } from "./FormContext.ts";
+import type { WorkshopData } from "./FormContext.ts";
 
-const FormContextProvider = ({children} : {children : ReactNode}) =>{
+
+const FormContextProvider = ({children} : {children : ReactNode}) => {
 const [formStatus, setFormStatus] = useState(false);
-const[formData, setFormData] = useState<WorkshopData>({
+const [formData, setFormData] = useState<WorkshopData>({
     collegeName : "",
     workshopName : "",
     date : "",
@@ -14,9 +17,17 @@ const[formData, setFormData] = useState<WorkshopData>({
 
 const updateFormData = (data:WorkshopData) =>{
     setFormData(data);
-}
+};
 
-const toggleForm
-}
+const toggleFormStatus = () =>{
+    setFormStatus((prevStatus) => !prevStatus);
+};
 
-export default FormContextProvider
+return(
+    <FormContext.Provider value = {{formData, updateFormData, toggleFormStatus, formStatus}}>
+        {children}
+    </FormContext.Provider>
+);
+};
+
+export default FormContextProvider;
