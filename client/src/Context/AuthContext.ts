@@ -1,14 +1,18 @@
 import { createContext , useContext } from "react";
-import User  from 'firebase/auth';
+import { type User } from 'firebase/auth';
 
-type User = {
-    uid : string;
-    email : string;
-    role : 'admin' | 'user'
-}
+// extend firebase's User type to optionally include a role
+export type AppUser = User & {role?: string};
+
+// type User = {
+//     uid : string;
+//     email : string;
+//     role : 'admin' | 'user'
+// }
 
 export type AdminType = {
-    user : User | null;
+    user : AppUser | null;
+    role : string | null;
     logIn : (email : string, password : string) => void;
     signUp : (email : string, password : string, role : string) => void;
     logOut : () => void;

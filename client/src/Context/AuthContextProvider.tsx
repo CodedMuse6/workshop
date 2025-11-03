@@ -50,4 +50,4 @@ return(
 
 }
 
-export const AuthContextProvider
+export default AuthContextProvider

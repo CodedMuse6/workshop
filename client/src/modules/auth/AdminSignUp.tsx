@@ -1,0 +1,101 @@
+import { useState } from "react";
+import  { useForm } from "react-hook-form";
+import { authschema } from "./schema/AuthSchema.tsx";
+import type { AuthSchema } from "./schema/AuthSchema.tsx";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/Context/AuthContext.ts";
+import {Link, useNavigate} from 'react-router-dom';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button.tsx";
+import { Label } from "@/components/ui/label.tsx";
+import FormError from "./components/FormError.tsx";
+import {Eye, EyeOff} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
+
+const AdminSignUp = () =>{
+const {signUp} = useAuth();
+const navigate = useNavigate();
+ const [showPassword, setShowPassword] = useState(false);
+const {register, handleSubmit, formState:{errors}} = useForm<AuthSchema>({resolver: zodResolver(authschema)});
+
+const onSubmit = async(data:AuthSchema) => {
+    try{
+        const role = await signUp(data.email, data.password, data.role);
+        navigate(role === "admin" ? "/admin" : "/");
+    } catch(error){
+        console.log('Signup failed', error);
+        
+    }
+}
+    return(
+         <div className='flex-justify-center items-center min-h-screen bg-gray-50'>
+            <Card className="w-[400px] shadow-lg">
+            <CardHeader>
+                <CardTitle className="text-center text-xl font-semibold">
+                    Admin SignUp
+                </CardTitle>
+            </CardHeader>
+        <CardContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+            <div>
+            <Label htmlFor = "email">Email</Label>
+            <Input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            autoComplete = "off"
+            {...register("email")}
+            />
+            <FormError message={errors.email?.message}/>
+            </div>
+
+            <div>
+                <Label htmlFor = "password">Password</Label>
+                <div>
+                <Input
+                id = "password"
+                type = {showPassword ? "text" : "password"}
+                placeholder = "Enter your password"
+                autoComplete = "off"
+                {...register("password")}
+                />
+                {/* Toggle Button */}
+                <button type="button" onClick = {() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff size={18}/> :<Eye size = {18}/>}
+                </button>
+                </div>
+               <FormError message = {errors.password?.message}/>
+            </div> 
+
+             <div>
+                <Label htmlFor = "confirmpassword">Confirm Password</Label>
+                <div>
+                <Input
+                id = "confirmpassword"
+                type = {showPassword ? "text" : "password"}
+                placeholder = "Confirm your password"
+                autoComplete = "off"
+                {...register("confirmPassword")}
+                />
+                {/* Toggle Button */}
+                <button type="button" onClick = {() => setShowPassword(!showPassword)}>
+                    {showPassword ? <EyeOff size={18}/> :<Eye size = {18}/>}
+                </button>
+                </div>
+               <FormError message = {errors.password?.message}/>
+            </div> 
+
+            {/* Submit button */}
+            <Button type="submit" className = "w-full font-semibold">SignUp</Button>
+
+            <p>Don&apos;t have an account?{""}
+                <Link to = "/">LogIn</Link>
+            </p>   
+        </form>
+         </CardContent>
+          </Card>
+          </div>
+    );
+};
+
+export default AdminSignUp;
