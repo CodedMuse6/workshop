@@ -1,35 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import {Login} from "./routes/Login.tsx";
+import {AdminDashboard} from "./routes/AdminDashboard.tsx";
+import {CreateForm} from "./routes/CreateForm.tsx";
+import {StudentForm} from "./routes/StudentForm.tsx";
+import {AuthContextProvider} from "./Context/AuthContextProvider.tsx";
+import {ProtectedRoute} from "./modules/components/ProtectedRoute.tsx";
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+return (
+    <AuthContextProvider>
+      <BrowserRouter>
+      <Routes>
+        <Route path = "/login" element = {<Login/>} / >
+        <Route
+        path = "/admin"
+        element = {
+          <ProtectedRoute>
+            <AdminDashboard/>
+          </ProtectedRoute>
+        }
+        />
+        <Route 
+        path = "/admin/create"
+        element = {
+          <ProtectedRoute>
+            <CreateForm />
+          </ProtectedRoute>
+        }
+        />
+        <Route path = "/form/:formId" element = {<StudentForm />} />
+      </Routes>
+      </BrowserRouter>
+    </AuthContextProvider>
+  );
 }
 
 export default App

@@ -8,7 +8,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {Input} from  "@/components/ui/input.tsx";
 import { Button } from '@/components/ui/button.tsx';
 import { Label } from '@/components/ui/label.tsx';
-import FormError from './components/FormError.tsx';
+import FormError from '../components/FormError.tsx';
 import {Eye, EyeOff} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx'
 

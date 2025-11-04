@@ -6,8 +6,8 @@ export const workshopschema = z.object({
     date : z.string().min(1, 'Date are required'),
     time: z.string().min(1, 'Time are required'),
     instructions : z.string().min(1, "Instructions are required"),
-    formStatus : z.boolean().default(false),
-    studentEmail : z.string().email('Invalid email address').min(1, 'Student email is required')
+    // formStatus : z.boolean().default(false),
+    // studentEmail : z.string().email('Invalid email address').min(1, 'Student email is required')
 });
 
 export type WorkshopSchema = z.infer<typeof workshopschema>
