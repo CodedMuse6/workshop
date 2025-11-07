@@ -17,12 +17,16 @@ export const FormBuilder = () => {
     });
 
     const onSubmit = async(data: WorkshopSchema) => {
+        try{
         const ref = await addDoc(collection(db, "forms"),{
             ...data,
             status: "off",
             createdAt : new Date().toISOString(),
         });
         alert(`Form created with ID: ${ref.id}`);
+        } catch (error) {
+            alert(error);
+        }
     };
 
     return(
