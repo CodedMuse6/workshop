@@ -11,7 +11,7 @@ const[user, setUser] = useState<User | null>(null);
 const[loading, setLoading] = useState<boolean>(true);
 
 useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (u) =>{
+    const unsubscribe = onAuthStateChanged(auth, (u) => {
         setUser(u);
         setLoading(false);
     });
@@ -41,14 +41,13 @@ useEffect(() => {
 // const fetchUserRole = async(userId:string) =>{
 //     const userDoc = await getDoc(doc(db, 'users' , userId));
 //     return userDoc.exists()?.userDoc.role;
-// }
+//}
 
 return(
     <AuthContext.Provider value = {{user, loading}}>
      {children}
     </AuthContext.Provider>
 )
-
 }
 
 export default AuthContextProvider
