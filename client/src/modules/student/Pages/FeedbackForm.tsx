@@ -1,6 +1,6 @@
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {db,auth, setupRecaptcha} from "config/Firebase.ts";
+import {db,auth, setupRecaptcha} from "../../../config/Firebase.ts";
 import {doc, getDocs, collection,query, where, addDoc, Timestamp} from "firebase/firestore";
 import {useParams, useNavigate} from "react-router-dom"
 import { studentschema } from "../schema/StudentSchema.ts";
@@ -14,9 +14,11 @@ import { Label } from "@/components/ui/label.tsx";
 import FormError from "../../components/FormError.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { useEffect , useState} from "react";
+import { generateCertificate } from "@/services/generateCertificate.ts";
 
 
-export const FormBuilder = () => {
+
+const FeedbackForm = () => {
     const {linkId} = useParams();
     const navigate = useNavigate();
     const [workshop, setWorkshop] = useState<any>(null); //<any>
@@ -118,7 +120,17 @@ export const FormBuilder = () => {
         createdAt: Timestamp.now()
       });
 
-      alert("Submitted successfully!");
+      const certificateUrl = await generateCertificate({
+        studentName: data.studentName,
+        course: data.course,
+        // phone:data.phone,
+        // email:data.email,
+        // feedback: data.feedback,
+        workshopName: workshop.workshopName,
+        linkId: linkId!,
+      });
+
+      alert("Submitted successfully! Certificate generated:" + certificateUrl);
       navigate("/submitted");
     };
 
@@ -246,3 +258,5 @@ export const FormBuilder = () => {
     )
 
 }
+
+export default FeedbackForm
