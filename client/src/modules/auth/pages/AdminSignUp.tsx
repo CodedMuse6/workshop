@@ -1,14 +1,14 @@
 import { useState } from "react";
 import  { useForm } from "react-hook-form";
-import { authschema } from "./schema/AuthSchema.tsx";
-import type { AuthSchema } from "./schema/AuthSchema.tsx";
+import { authschema } from "../schema/AuthSchema.ts";
+import type { AuthSchema } from "../schema/AuthSchema.ts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/Context/AuthContext.ts";
 import {Link, useNavigate} from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import FormError from "../components/FormError.tsx";
+import FormError from "../../components/FormError.tsx";
 import {Eye, EyeOff} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 
@@ -20,8 +20,10 @@ const {register, handleSubmit, formState:{errors}} = useForm<AuthSchema>({resolv
 
 const onSubmit = async(data:AuthSchema) => {
     try{
-        const role = await signUp(data.email, data.password, data.role);
-        navigate(role === "admin" ? "/admin" : "/");
+        // const role = await signUp(data.email, data.password, data.role);
+         await signUp(data.email, data.password, "admin");
+        // navigate(role === "admin" ? "/admin" : "/");
+        navigate("/admin/login");
     } catch(error){
         console.log('Signup failed', error);
         
