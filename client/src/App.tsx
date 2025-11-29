@@ -8,10 +8,12 @@ import AuthContextProvider from "./Context/AuthContextProvider.tsx";
 // import ProtectedRoute from "./modules/components/ProtectedRoute.tsx";
 import './App.css'
 import { router } from './router.tsx';
+import FormContextProvider from './Context/FormContextProvider.tsx';
 
 function App() {
 return (
     <AuthContextProvider>
+      <FormContextProvider>
       <RouterProvider router = {router} />
       {/* <BrowserRouter>
       <Routes>
@@ -35,6 +37,7 @@ return (
         <Route path = "/form/:formId" element = {<StudentForm />} />
       </Routes>
       </BrowserRouter> */}
+      </FormContextProvider>
     </AuthContextProvider>
   );
 }

@@ -18,7 +18,7 @@ export const router = createBrowserRouter([
         element:<AdminSignUp/>
     },
     {
-        path:"/admin",
+        path:"/", //admin
         element:(
             <ProtectedRoute role = "admin">
                 <AdminDashboard />

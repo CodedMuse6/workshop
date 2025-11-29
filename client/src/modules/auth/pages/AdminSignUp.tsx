@@ -15,22 +15,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.t
 const AdminSignUp = () =>{
 const {signUp} = useAuth();
 const navigate = useNavigate();
- const [showPassword, setShowPassword] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
+const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 const {register, handleSubmit, formState:{errors}} = useForm<AuthSchema>({resolver: zodResolver(authschema)});
 
 const onSubmit = async(data:AuthSchema) => {
     try{
         // const role = await signUp(data.email, data.password, data.role);
-         await signUp(data.email, data.password, "admin");
+         await signUp(data.email, data.password, "admin" ); 
         // navigate(role === "admin" ? "/admin" : "/");
         navigate("/admin/login");
+        // navigate("/login");
     } catch(error){
         console.log('Signup failed', error);
         
     }
 }
     return(
-         <div className='flex-justify-center items-center min-h-screen bg-gray-50'>
+         <div className='flex justify-center items-center min-h-screen bg-gray-50'>
             <Card className="w-[400px] shadow-lg">
             <CardHeader>
                 <CardTitle className="text-center text-xl font-semibold">
@@ -74,24 +76,24 @@ const onSubmit = async(data:AuthSchema) => {
                 <div>
                 <Input
                 id = "confirmpassword"
-                type = {showPassword ? "text" : "password"}
+                type = {showConfirmPassword ? "text" : "password"}
                 placeholder = "Confirm your password"
                 autoComplete = "off"
                 {...register("confirmPassword")}
                 />
                 {/* Toggle Button */}
-                <button type="button" onClick = {() => setShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff size={18}/> :<Eye size = {18}/>}
+                <button type="button" onClick = {() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? <EyeOff size={18}/> :<Eye size = {18}/>}
                 </button>
                 </div>
-               <FormError message = {errors.password?.message}/>
+               <FormError message = {errors.confirmPassword?.message}/>
             </div> 
 
             {/* Submit button */}
             <Button type="submit" className = "w-full font-semibold">SignUp</Button>
 
-            <p>Don&apos;t have an account?{""}
-                <Link to = "/">LogIn</Link>
+            <p>Do you have an account?{""}
+                <Link to = "/admin/login">LogIn</Link>
             </p>   
         </form>
          </CardContent>

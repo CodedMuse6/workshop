@@ -24,8 +24,8 @@ const ProtectedRoute = ({children, role} : ProtectedRouteProps) => {
 
     if(!user) return <Navigate to = "/admin/login" />;
 
-    if(role && user.role !== role) return <Navigate to="/unauthorized"/>;
-
+    if(role && user.role !== role) return <Navigate to="/admin/login"/>;
+{/* <Navigate to="/unauthorized"/> */}
     return<>{children}</>;
 }
 

@@ -8,7 +8,7 @@ const {formData, fetchForms, toggleStatus} = useFormDataContext();
 
 useEffect(() => {
     fetchForms();
-},[]);
+},);
 
 return(
     <div>

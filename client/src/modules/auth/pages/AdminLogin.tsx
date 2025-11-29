@@ -21,7 +21,7 @@ const AdminLogin = () =>{
     const onSubmit =  async(data:LoginSchema) => {
         try{
          await logIn(data.email, data.password);
-         navigate('/admin');
+          navigate('/admin');
         } catch(error){
          console.log('Login failed please try again', error);
         };
