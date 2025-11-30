@@ -26,11 +26,20 @@ const onSubmit = async(data:AuthSchema) => {
         // navigate(role === "admin" ? "/admin" : "/");
         navigate("/admin/login");
         // navigate("/login");
-    } catch(error){
-        console.log('Signup failed', error);
-        
+        // navigate("/");
+    } catch(error:unknown){
+        if(error instanceof Error && error.message.includes("Admin already exists")){
+          alert("Admin account already created!No more admins allowed.");
+        // if(error.message.includes("Admin already exists")){
+        //   alert("Admin account already created!No more admins allowed.");
+        // }
+        // console.log('Signup failed', error);  
+    } else{
+        console.error("SIgnup failed", error);
+        // console.log("Signup failed");
+    } 
     }
-}
+};
     return(
          <div className='flex justify-center items-center min-h-screen bg-gray-50'>
             <Card className="w-[400px] shadow-lg">
@@ -93,7 +102,7 @@ const onSubmit = async(data:AuthSchema) => {
             <Button type="submit" className = "w-full font-semibold">SignUp</Button>
 
             <p>Do you have an account?{""}
-                <Link to = "/admin/login">LogIn</Link>
+                <Link to="/admin/login">LogIn</Link>
             </p>   
         </form>
          </CardContent>

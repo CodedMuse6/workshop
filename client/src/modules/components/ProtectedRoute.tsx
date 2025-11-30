@@ -12,7 +12,7 @@ import { useAuth } from "@/Context/AuthContext.ts";
 // }
 interface ProtectedRouteProps{
     children: React.ReactNode;
-    role?: "admin" | "student";
+    role?: "admin" | "student" | "user";
 }
 
 const ProtectedRoute = ({children, role} : ProtectedRouteProps) => {
@@ -22,10 +22,24 @@ const ProtectedRoute = ({children, role} : ProtectedRouteProps) => {
     return <div>Loading...</div>
     }
 
-    if(!user) return <Navigate to = "/admin/login" />;
+    // if the user is logged in and trying to access the login page, redirect to 
+    if(user && window.location.pathname === "/admin/login"){
+        return <Navigate to="/admin" />;
+    }
 
-    if(role && user.role !== role) return <Navigate to="/admin/login"/>;
-{/* <Navigate to="/unauthorized"/> */}
+    // if no user $ trying to access protected pages like /admin, redirect to /admin or the relevent dashboard
+    if(!user) {
+        return<Navigate to="/admin/login"/>;
+    }
+
+    // if the role doesn't match, navigate to "unauthorized"
+    if(role && user.role !== role){
+        return<Navigate to="/unauthorized"/>;
+    }
+    // if(!user) return <Navigate to="/admin/login" replace/>;
+
+    // if(role && user.role !== role) return <Navigate to="/admin/login"/>;
+    // if(role && user.role !== role) return <Navigate to="/unauthorized" replace/>;
     return<>{children}</>;
 }
 

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import { useAuth } from '../../../Context/AuthContext.ts';
 import {Link, useNavigate} from 'react-router-dom';
@@ -20,12 +20,27 @@ const AdminLogin = () =>{
 
     const onSubmit =  async(data:LoginSchema) => {
         try{
-         await logIn(data.email, data.password);
-          navigate('/admin');
+        //  await logIn(data.email, data.password);
+        const role = await logIn(data.email, data.password);
+        if(role === "admin") navigate("/admin");
+        else navigate("/");
+        //   navigate('/admin');
         } catch(error){
-         console.log('Login failed please try again', error);
+            console.error("Login failed", error);
+            alert("Login failed! Check your credentials.")
+        //  console.log('Login failed please try again', error);
         };
-    }
+    };
+
+    // navigate afetr login if user is admin
+    useEffect(() =>{
+        if(user?.role === "admin"){
+            navigate("/admin");
+        }
+        // if(user?.role === "user"){
+        //     navigate("/");
+        // }
+    },[user, navigate]);
 
     if(user){
     return(
@@ -40,7 +55,7 @@ const AdminLogin = () =>{
         {user.role === 'admin' ? (<p>Welcome, Admin! You can create forms.</p>):(
             <p>You are logged in as a user, but You can not create forms.</p>
         )}
-        <Button onClick = {logOut}></Button>
+        <Button onClick = {logOut}>Logout</Button>
          </CardContent>
         </Card>
        </div>
@@ -91,11 +106,12 @@ const AdminLogin = () =>{
             <Button type="submit" className = "w-full font-semibold">Log In</Button>
 
             <p>Don&apos;t have an account?{""}
-                <Link to = "/admin/signup">SignUp</Link>
+                <Link to = "/">SignUp</Link>
             </p>   
         </form>
          </CardContent>
           </Card>
+         
           </div>
     );
 };

@@ -19,26 +19,66 @@ const[loading, setLoading] = useState<boolean>(true);
 //     return() => unsubscribe();
 // },[])
 
+// check if admin already exists
+const checkAdminExists = async()=>{
+    const adminDoc = await getDoc(doc(db, "roles", "admin"));
+    return adminDoc.exists();
+
+    // const q = query(collection(db, "users"), where("role", "===" , "admin"));
+    // const snapshot = await getDocs(q);
+    // return !snapshot.empty;
+};
+
 // signup - also save role in firestore
 const signUp = async(email : string , password : string , role : string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email , password);
-    const user = userCredential.user;
-    await setDoc(doc(db, 'users', user.uid),{
-        // email, role,
-        email: user.email,
-        role:role
-    });
+// const signUp = async(email, password, role) => {
+    const adminExists = await checkAdminExists();
+    // if admin exists, nobady else can register as admin
+    if(role === "admin" && adminExists){
+        throw new Error("Admin already exists");
+    }
+
+    // create firebase user
+    const res = await createUserWithEmailAndPassword(auth, email , password);
+    const uid = res.user.uid;
+
+    // store user role in firestore
+    await setDoc(doc(db, "users", uid), {email,role});
+
+    // if role is admin store single-admin flag
+    if(role === "admin"){
+        await setDoc(doc(db, "roles", "admin"),{uid});
+    }
+
+    return role;
+    // const userCredential = await createUserWithEmailAndPassword(auth, email , password);
+    // const user = userCredential.user;
+    // await setDoc(doc(db, 'users', user.uid),{
+    //     // email, role,
+    //     email: user.email,
+    //     role:role
+    // });
 };
 
 // login
 const logIn = async(email : string, password : string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    // await signInWithEmailAndPassword(auth, email, password);
+    const res = await signInWithEmailAndPassword(auth, email, password);
+    const uid = res.user.uid;
+
+    const userDoc = await getDoc(doc(db, "users", uid));
+    const role = userDoc.data()?.role || "user";
+
+    setUser({uid, email:res.user.email, role});
+
+    return role;
 };
 
 // logout
 const logOut = async() => {
     // await auth.signOut();
     await signOut(auth);
+    setUser(null);
 }
 
 // fetchUser
@@ -49,20 +89,29 @@ const logOut = async() => {
 
 // fetchuser + role
 useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (u) => {
-        if(u){
-            const snap = await getDoc(doc(db, "users", u.uid));
-            const role = snap.exists() ? snap.data().role : "user";
-
-            setUser({
-                uid: u.uid,
-                email:u.email,
-                role
-            });
-        } else {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+        if(!firebaseUser){
             setUser(null);
+            setLoading(false);
+            return;
         }
-        setLoading(false);
+        const uid = firebaseUser.uid;
+        const userDoc = await getDoc(doc(db, "users", uid));
+        const role = userDoc.data()?.role || "user";
+        setUser({uid, email:firebaseUser.email, role});
+        //     const snap = await getDoc(doc(db, "users", u.uid));
+        //     const role = snap.exists() ? snap.data().role : "user";
+
+        //     setUser({
+        //         uid: u.uid,
+        //         email:u.email,
+        //         role
+        //     });
+        // } else {
+        //     setUser(null);
+        // }
+         setLoading(false);
+         
     });
     return () => unsubscribe();
 },[]);

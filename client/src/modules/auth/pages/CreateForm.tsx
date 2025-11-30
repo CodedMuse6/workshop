@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import FormError from "@/modules/components/FormError";
 import { Card, CardContent, CardHeader, CardTitle  } from "@/components/ui/card";
 
+
 const CreateForm = () => {
     const {createForm} = useFormDataContext();
     const {register,handleSubmit, formState:{errors}} = useForm<WorkshopSchema>({
@@ -16,12 +17,22 @@ const CreateForm = () => {
     });
 
     const onSubmit = async(data: WorkshopSchema) => {
+        // const formDataToCreate = {
+        //     ...data,
+        //     status: "off", //default status
+        //     studentEmail: "", //default empty
+        // };
+        // await createForm(formDataToCreate);
         await createForm(data);
+        // toast({
+        //     title: "Form Created!",
+        //     description : "Workshop form is ready and active.",
+        // });
         alert("Workshop form created successfully!");
     };
 
     return(
-     <div className='flex-justify-center items-center min-h-screen bg-gray-50'>
+     <div className='flex justify-center items-center min-h-screen bg-gray-50'>
             <Card className="w-[400px] shadow-lg">
             <CardHeader>
                 <CardTitle className="text-center text-xl font-semibold">

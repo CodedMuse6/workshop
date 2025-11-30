@@ -28,9 +28,9 @@ interface AuthContextType {
 
     user:AppUser | null;
     loading : boolean;
-    logIn : (email : string, password : string) => Promise<void>;
-    signUp : (email : string, password : string, role : string) => Promise<void>;
-    logOut : () => void;
+    logIn : (email : string, password : string) => Promise<string>;
+    signUp : (email : string, password : string, role : string) => Promise<string>;
+    logOut : () => Promise<void>;
 }
 
 // export type AdminType = {
