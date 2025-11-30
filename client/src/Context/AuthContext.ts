@@ -1,5 +1,5 @@
 import { createContext , useContext } from "react";
-import { type User } from "firebase/auth";
+// import { type User } from "firebase/auth";
 
 // extend firebase's User type to optionally include a role
 // export type AppUser = User & {role?: string};
