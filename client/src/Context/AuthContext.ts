@@ -31,6 +31,7 @@ interface AuthContextType {
     logIn : (email : string, password : string) => Promise<string>;
     signUp : (email : string, password : string, role : string) => Promise<string>;
     logOut : () => Promise<void>;
+    deleteAdmin : (uid: string) => Promise<void>;
 }
 
 // export type AdminType = {

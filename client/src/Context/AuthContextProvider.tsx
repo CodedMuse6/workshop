@@ -1,8 +1,8 @@
 import {AuthContext} from "./AuthContext";
 import type {AppUser} from "./AuthContext";
-import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,signOut } from "firebase/auth"
+import { onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword,signOut, deleteUser } from "firebase/auth"
 // import {type User} from "firebase/auth"
-import {doc , setDoc , getDoc} from 'firebase/firestore';
+import {doc , setDoc , getDoc, deleteDoc} from 'firebase/firestore';
 import {auth , db} from '../config/Firebase';
 import {useEffect,useState, type ReactNode} from "react";
 
@@ -79,7 +79,24 @@ const logOut = async() => {
     // await auth.signOut();
     await signOut(auth);
     setUser(null);
-}
+};
+
+// deleteAdmin function
+const deleteAdmin = async(uid:string) => {
+    try{
+        const user = auth.currentUser;
+        if(user){
+            await deleteUser(user); //delete from firebase authentication
+        }
+
+        await deleteDoc(doc(db, "users", uid));
+        await deleteDoc(doc(db, "roles", "admin"));
+
+        console.log("Admin deleted successfully");
+    } catch(error){
+        console.error("Error deleting admin:", error);
+    }
+};
 
 // fetchUser
 // const fetchUserRole = async(userId:string) =>{
@@ -111,13 +128,13 @@ useEffect(() => {
         //     setUser(null);
         // }
          setLoading(false);
-         
+
     });
     return () => unsubscribe();
 },[]);
 
 return(
-    <AuthContext.Provider value = {{user, loading, logIn, logOut, signUp}}>
+    <AuthContext.Provider value = {{user, loading, logIn, logOut, signUp, deleteAdmin}}>
      {children}
     </AuthContext.Provider>
 )
