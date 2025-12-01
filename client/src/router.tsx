@@ -16,7 +16,7 @@ export const router = createBrowserRouter([
         element: <Home/>
     },
      {
-        path: "/unauthorized", 
+        path: "/unauthorized",
         element: <Forbidden/>
     },
     {

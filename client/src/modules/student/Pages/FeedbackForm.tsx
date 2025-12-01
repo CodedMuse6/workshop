@@ -107,7 +107,7 @@ const FeedbackForm = () => {
 
     const onSubmit = async(data: StudentSchema) => {
       if(!phoneVerified || !emailVerified){
-        alert("Please verify both phone & email");
+        alert("Please verify both phone & email before submitting");
         return;
       }
 
@@ -117,7 +117,9 @@ const FeedbackForm = () => {
         ...data,
         phoneVerified,
         emailVerified,
-        createdAt: Timestamp.now()
+        createdAt: Timestamp.now(),
+        certificateUrl:"",
+        status:"pending",
       });
 
       const certificateUrl = await generateCertificate({
@@ -185,6 +187,7 @@ const FeedbackForm = () => {
                 {...register("phone")}
                 maxLength={10}
                 />
+
                 {!phoneVerified && (
                     <div>
                         {!phoneOtpSent ? (
@@ -260,3 +263,6 @@ const FeedbackForm = () => {
 }
 
 export default FeedbackForm
+
+
+

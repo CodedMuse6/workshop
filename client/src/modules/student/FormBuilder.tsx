@@ -24,7 +24,6 @@ export const FormBuilder = () => {
             createdAt : new Date().toISOString(),
         });
         alert(`Form created with ID: ${ref.id}`);
-        } catch (error) {
             alert(error);
         }
     };

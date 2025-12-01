@@ -66,7 +66,7 @@ return(
                 ))}
             </tbody>
         </table>
-        </CardContent>
+</CardContent>
         </Card>
         </main>
     </div>
