@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import React, {useState, useRef} from "react";
+import React, {useState, useRef, useEffect} from "react";
 // import { optional } from "zod";
 
 interface OTPInputProps{
@@ -21,6 +21,7 @@ export default function OTPInput({
 const[otp, setOtp] = useState<string[]>(Array(length).fill(""));
 const[isSent, setIsSent] = useState(false);
 const[verified, setVerified] = useState(false);
+const[resendTimer, setResendTimer] = useState(0);
 const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
 
@@ -47,9 +48,16 @@ const handlekeyDown = (e:React.KeyboardEvent, index:number) => {
 
 // button: send otp
 const handleSendOTP = async() =>{
+    try{
     await onSendOTP();
     setIsSent(true);
+    setResendTimer(60);
     alert("OTP sent!");
+    } catch(err){
+        console.error(err);
+        alert("Failed to send OTP. Try again.");
+    }
+  
 };
 
 // button : verify otp
@@ -69,9 +77,19 @@ if(ok){
     onVerified();
     alert("OTP Verified Successfully");
 }else{
-    alert("Invalid OTP, Try again");
+    setOtp(Array(length).fill(""));
+    inputRefs.current[0]?.focus();
+    alert("Invalid OTP, Please Try again");
 }
-}
+};
+
+useEffect(() => {
+    if(resendTimer === 0) return;
+    const interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+    }, 1000);
+    return() => clearInterval(interval);
+},[resendTimer]);
 
 
 return(
@@ -81,7 +99,7 @@ return(
          {otp.map((digit,index) =>(
             <Input
              key={index}
-             ref={(el) => (inputRefs.current[index] = el)}
+             ref={(el: HTMLInputElement | null) => {inputRefs.current[index] = el;}}
              maxLength={1}
              value = {digit}
              onChange = {(e) => handleChange(e.target.value,index)}
@@ -105,7 +123,7 @@ return(
              <Button 
              type="button"
              onClick={handleSendOTP}
-             disabled={isSent}
+             disabled={isSent && resendTimer > 0}
              style={{
                 padding:"8px",
                 background: isSent ? "#aaa" : "#007bff",
@@ -113,7 +131,8 @@ return(
                 borderRadius:"4px",
              }}
               >
-                {isSent? "OTP Sent" : "Send OTP"}
+                {/* {isSent? "OTP Sent" : "Send OTP"} */}
+                {isSent ? (resendTimer > 0 ? `Resend in ${resendTimer}s` : "Resend OTP") : "send OTP"}
              </Button>
 
              <Button

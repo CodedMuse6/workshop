@@ -168,9 +168,9 @@ const FeedbackForm = () => {
             </div>
 
             <div>
-                <Label htmlFor = "workshopName">Workshop Name</Label>
+                <Label htmlFor = "course">Workshop Name</Label>
                 <Input
-                id = " course"
+                id = "course"
                 type = "text"
                 placeholder = "Workshop Name"
                 {...register("course")}
@@ -182,8 +182,8 @@ const FeedbackForm = () => {
              <div>
                 <Label htmlFor = "phone">Phone</Label>
                 <Input
-                id = " phone"
-                type = "number"
+                id = "phone"
+                type = "text"
                 {...register("phone")}
                 maxLength={10}
                 />
@@ -259,8 +259,7 @@ const FeedbackForm = () => {
           <div id = "recaptcha-container"></div>
           </div>
     )
-
-}
+};
 
 export default FeedbackForm
 

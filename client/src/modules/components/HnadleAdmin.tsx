@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/Context/AuthContext";
 
-const AdminSettings = () => {
+const HandleAdmin = () => {
     const {deleteAdmin} = useAuth();
 
     const handleDeleteAdmin = async(uid: string) => {
@@ -15,7 +15,4 @@ const AdminSettings = () => {
     );
 };
 
-export default AdminSettings
-
-
-
+export default HandleAdmin
