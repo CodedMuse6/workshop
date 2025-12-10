@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import {getAuth, RecaptchaVerifier} from "firebase/auth";
+import {getAuth} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import {getStorage} from "firebase/storage";
 import {getFunctions} from "firebase/functions";
@@ -26,21 +26,21 @@ export const storage = getStorage(app);
 export const functions = getFunctions(app);
 export default app;
 
-declare global{
-  interface Window{
-    recaptchaVerifier?:RecaptchaVerifier;
-  }
-}
+// declare global{
+//   interface Window{
+//     recaptchaVerifier?:RecaptchaVerifier;
+//   }
+// }
 
-// Recaptcha for phone otp
-export const setupRecaptcha = () => {
-  if(!window.recaptchaVerifier){
-    window.recaptchaVerifier = new RecaptchaVerifier(auth,"recaptcha-container", 
-      {size:"invisible"},
-    );
-    window.recaptchaVerifier.render();
-  }
-  // return new RecaptchaVerifier(auth, "recaptcha-container", {
-  //   size: "invisible"
-  // });
-};
+// // Recaptcha for phone otp
+// export const setupRecaptcha = () => {
+//   if(!window.recaptchaVerifier){
+//     window.recaptchaVerifier = new RecaptchaVerifier(auth,"recaptcha-container", 
+//       {size:"invisible"},
+//     );
+//     window.recaptchaVerifier.render();
+//   }
+//   // return new RecaptchaVerifier(auth, "recaptcha-container", {
+//   //   size: "invisible"
+//   // });
+// };

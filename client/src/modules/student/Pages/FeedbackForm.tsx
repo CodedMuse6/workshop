@@ -1,40 +1,47 @@
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {db,auth, setupRecaptcha} from "../../../config/Firebase.ts";
-import {doc, getDocs, collection,query, where, addDoc, Timestamp} from "firebase/firestore";
-import {useParams, useNavigate} from "react-router-dom"
+import {db, storage} from "../../../config/Firebase.ts";
+import {getDocs, collection,query, where, addDoc,serverTimestamp} from "firebase/firestore";
+import {useParams} from "react-router-dom"
 import { studentschema } from "../schema/StudentSchema.ts";
 import type { StudentSchema } from "../schema/StudentSchema.ts";
-import {signInWithPhoneNumber} from "firebase/auth";
-import type {ConfirmationResult} from "firebase/auth";
-import { requestEmailOTP, verifyEmailOTP } from "@/services/otpEmail.ts";
+// import {signInWithPhoneNumber} from "firebase/auth";
+// import type {ConfirmationResult} from "firebase/auth";
+// import { requestEmailOTP, verifyEmailOTP } from "@/services/otpEmail.ts";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import FormError from "../../components/FormError.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { useEffect , useState} from "react";
-import { generateCertificate } from "@/services/generateCertificate.ts";
+import { useCertificateGenerator } from "@/services/generateCertificate.ts";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+// import { OTPForm } from "@/modules/components/OTPForm.tsx";
+import { OTPInput } from "@/modules/components/OTPInput.tsx";
+import { Textarea } from "@/components/ui/textarea.tsx";
+import type { WorkshopSchema } from "../schema/FormSchema.ts";
+// import { MultiSelectValueError } from "pdf-lib";
 
 
 
 const FeedbackForm = () => {
     const {linkId} = useParams();
-    const navigate = useNavigate();
-    const [workshop, setWorkshop] = useState<any>(null); //<any>
-    const [loading, setLoading] = useState(true);
-    const [phoneOtpSent, setPhoneOtpSent] = useState(false);
-    const [phoneCode, setPhoneCode] = useState("");
-    const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-    const [phoneVerified, setPhoneVerified] = useState(false);
-    const [emailOtpSent, setEmailOtpSent] = useState(false);
-    const [emailCode, setEmailCode] = useState("");
-    const [emailVerified, setEmailVerified] = useState(false);
-    const {register, handleSubmit, watch, formState:{errors}} = useForm<StudentSchema>({
+    // const navigate = useNavigate();
+    const [workshop, setWorkshop] = useState<WorkshopSchema | null>(null); //<any>
+    const [loading, setLoading] = useState<boolean>(true);
+    const {generateCertificate}  = useCertificateGenerator();
+    // const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+    // const [phoneCode, setPhoneCode] = useState("");
+    // const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+    // const [phoneVerified, setPhoneVerified] = useState(false);
+    // const [emailOtpSent, setEmailOtpSent] = useState(false);
+    // const [emailCode, setEmailCode] = useState("");
+    // const [emailVerified, setEmailVerified] = useState(false);
+    const {register, handleSubmit,setValue,watch, formState:{errors}} = useForm<StudentSchema>({
         resolver: zodResolver(studentschema),
     });
-    const email = watch("email");
-    const phone = watch("phone");
+    // const email = watch("email");
+    // const phone = watch("phone");
 
     // load workshop by linkId
     useEffect(() => {
@@ -46,7 +53,9 @@ const FeedbackForm = () => {
             const snap = await getDocs(q);
 
             if(!snap.empty){
-                setWorkshop(snap.docs[0].data());
+                const docData = snap.docs[0].data() as WorkshopSchema;
+                setWorkshop(docData);
+                // setWorkshop(snap.docs[0].data() as WorkshopSchema);
             }
             setLoading(false);
         };
@@ -54,90 +63,111 @@ const FeedbackForm = () => {
     },[linkId]);
 
     // send phone otp
-    const sendPhoneOTP = async () => {
-        try{
-            setupRecaptcha(); //invisible
-            const phoneNumber = "+91" + phone;
+    // const sendPhoneOTP = async () => {
+    //     try{
+    //         setupRecaptcha(); //invisible
+    //         const phoneNumber = "+91" + phone;
 
-            const confirmation = await signInWithPhoneNumber(auth, phoneNumber,window.recaptchaVerifier);
-            setConfirmationResult(confirmation);
-            setPhoneOtpSent(true);
-            alert("OTP sent to phone!");
-        } catch (err) {
-            console.error(err);
-            alert("Failed to send OTP");
-        }
-    };
+    //         const confirmation = await signInWithPhoneNumber(auth, phoneNumber,window.recaptchaVerifier);
+    //         setConfirmationResult(confirmation);
+    //         setPhoneOtpSent(true);
+    //         alert("OTP sent to phone!");
+    //     } catch (err) {
+    //         console.error(err);
+    //         alert("Failed to send OTP");
+    //     }
+    // };
 
-    const verifyPhoneOTP = async () =>{
-        if(!confirmationResult) return;
-        try{
-            await confirmationResult.confirm(phoneCode);
-            setPhoneVerified(true);
-            alert("Phone verified");
-        } catch(err) {
-            alert("Invalid OTP");
-        }
-    }
+    // const verifyPhoneOTP = async () =>{
+    //     if(!confirmationResult) return;
+    //     try{
+    //         await confirmationResult.confirm(phoneCode);
+    //         setPhoneVerified(true);
+    //         alert("Phone verified");
+    //     } catch(err) {
+    //         alert("Invalid OTP");
+    //     }
+    // }
 
     // send email otp
-    const sendEmailOTP = async () => {
-        try{
-            await requestEmailOTP(email);
-            setEmailOtpSent(true);
-            alert("Email OTP sent!");
-        } catch(err) {
-            alert("Failed to send email OTP");
-        }
-    };
+    // const sendEmailOTP = async () => {
+    //     try{
+    //         await requestEmailOTP(email);
+    //         setEmailOtpSent(true);
+    //         alert("Email OTP sent!");
+    //     } catch(err) {
+    //         alert("Failed to send email OTP");
+    //     }
+    // };
 
-    const verifyEmail = async () => {
-        try{
-            const valid = await verifyEmailOTP(email, emailCode);
-            if(valid){
-                setEmailVerified(true);
-                alert("Email verified");
-            } else {
-                alert("Invalid OTP");
-            }
-        } catch(err){
-            alert("Error verifying email OTP");
-        }
-    }
+    // const verifyEmail = async () => {
+    //     try{
+    //         const valid = await verifyEmailOTP(email, emailCode);
+    //         if(valid){
+    //             setEmailVerified(true);
+    //             alert("Email verified");
+    //         } else {
+    //             alert("Invalid OTP");
+    //         }
+    //     } catch(err){
+    //         alert("Error verifying email OTP");
+    //     }
+    // }
+
+    if(loading) return <p>Loading...</p>;
+    if(!workshop) return <p>Invalid link or Form not found</p>
 
     const onSubmit = async(data: StudentSchema) => {
-      if(!phoneVerified || !emailVerified){
-        alert("Please verify both phone & email before submitting");
+    //   if(!phoneVerified || !emailVerified){
+    //     alert("Please verify both phone & email before submitting");
+    //     return;
+    //   }
+
+    //   await addDoc(collection(db, "submissions"), {
+    //     workshopId: workshop.id,
+    //     linkId,
+    //     ...data,
+    //     phoneVerified,
+    //     emailVerified,
+    //     createdAt: Timestamp.now(),
+    //     certificateUrl:"",
+    //     status:"pending",
+    //   });
+
+    if(!workshop.templateUrl){
+        alert("certificate template missing!");
         return;
-      }
-
-      await addDoc(collection(db, "submissions"), {
-        workshopId: workshop.id,
-        linkId,
-        ...data,
-        phoneVerified,
-        emailVerified,
-        createdAt: Timestamp.now(),
-        certificateUrl:"",
-        status:"pending",
-      });
-
-      const certificateUrl = await generateCertificate({
+    }
+    //    Generate certificate PDF
+      const pdfBytes = await generateCertificate(workshop.templateUrl,{
         studentName: data.studentName,
-        course: data.course,
+        // course: data.course,
         // phone:data.phone,
         // email:data.email,
         // feedback: data.feedback,
         workshopName: workshop.workshopName,
-        linkId: linkId!,
+        collegeName: workshop.collegeName,
+        date:workshop.date,
+        linkId: linkId!
       });
 
+    //   upload certificate
+    const certRef = ref(storage, `certificates/${linkId}/${data.studentName}.pdf`);
+    await uploadBytes(certRef, pdfBytes);
+    const certificateUrl = await getDownloadURL(certRef);
+
+    // save submission
+    await addDoc(collection(db, "workshops", linkId!, "submissions"),{
+        ...data,
+        certificateUrl,
+        createdAt: serverTimestamp(),
+    })
+
       alert("Submitted successfully! Certificate generated:" + certificateUrl);
-      navigate("/submitted");
+    //   navigate("/submitted");
     };
 
-    if(loading) return <p>Loading...</p>;
-    if(!workshop) return <p>Invalid link</p>
+ 
 
     return(
        <div className='flex-justify-center items-center min-h-screen bg-gray-50'>
@@ -145,11 +175,12 @@ const FeedbackForm = () => {
             <CardHeader>
                 <CardTitle className="text-center text-xl font-semibold">
                    {workshop.workshopName} - Feedback Form
+                    <p><strong>College:</strong>{workshop.collegeName}</p>
                 </CardTitle>
             </CardHeader>
         <CardContent>
             <div>
-               <p><strong>College:</strong>{workshop.collegeName}</p>
+               {/* <p><strong>College:</strong>{workshop.collegeName}</p> */}
                <p><strong>Date:</strong>{workshop.date}</p>
                <p><strong>Time:</strong>{workshop.time}</p>
                <p><strong>Instructions</strong>{workshop.instructions}</p>
@@ -160,8 +191,8 @@ const FeedbackForm = () => {
             <Label htmlFor = "studentName">Student Name</Label>
             <Input
             id="studentName"
-            type="text"
-            placeholder="Your College Name"
+            // type="text"
+            placeholder="Enter Your Name"
             {...register("studentName")}
             />
             <FormError message={errors.studentName?.message}/>
@@ -171,7 +202,7 @@ const FeedbackForm = () => {
                 <Label htmlFor = "course">Workshop Name</Label>
                 <Input
                 id = "course"
-                type = "text"
+                // type = "text"
                 placeholder = "Workshop Name"
                 {...register("course")}
                 />
@@ -183,12 +214,17 @@ const FeedbackForm = () => {
                 <Label htmlFor = "phone">Phone</Label>
                 <Input
                 id = "phone"
-                type = "text"
+                // type = "text"
                 {...register("phone")}
                 maxLength={10}
                 />
 
-                {!phoneVerified && (
+            <OTPInput
+            type="phone"
+            target={watch("phone")}
+            onVerified={() => setValue("phoneVerified", true)}
+            />
+                {/* {!phoneVerified && (
                     <div>
                         {!phoneOtpSent ? (
                             <Button type = "button" onClick={sendPhoneOTP}>Send OTP</Button>
@@ -203,7 +239,7 @@ const FeedbackForm = () => {
                         )}
                     </div>
                 )}
-                {phoneVerified && <p>Phone Verified </p>}
+                {phoneVerified && <p>Phone Verified </p>} */}
                {/* <FormError message = {errors. phone?.message}/> */}
             </div> 
 
@@ -216,7 +252,7 @@ const FeedbackForm = () => {
                 {...register("email")}
                 />
 
-                {!emailVerified && (
+                {/* {!emailVerified && (
                     <div>
                       {!emailOtpSent ? (
                         <Button type = "button" onClick = {sendEmailOTP}>
@@ -234,16 +270,20 @@ const FeedbackForm = () => {
                       )}
 
                     </div>
-                )}
+                )} */}
+                <OTPInput 
+                type="email" 
+                target={watch("email")}
+                onVerified={() => setValue("emailVerified", true)}/>
                {/* <FormError message = {errors.email?.message}/> */}
-               {emailVerified && <p>Email Verified</p>}
+               {/* {emailVerified && <p>Email Verified</p>} */}
             </div>
 
              <div>
                 <Label htmlFor = "instructions">Feedback</Label>
-                <Input
-                id = " feedback"
-                type = "text"
+                <Textarea
+                id = "feedback"
+                // type = "text"
                 placeholder = "Instructions"
                 {...register("feedback")}
                 />
@@ -251,12 +291,12 @@ const FeedbackForm = () => {
             </div>
 
             {/* Submit button */}
-           <Button disabled = {!phoneVerified || !emailVerified} type = "submit">Submit Feedback</Button>
+           <Button disabled = {!watch("phoneVerified") || !watch("emailVerified")}>Submit Feedback</Button>
         </form>
          </CardContent>
           </Card>
 
-          <div id = "recaptcha-container"></div>
+          {/* <div id = "recaptcha-container"></div> */}
           </div>
     )
 };
