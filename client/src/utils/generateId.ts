@@ -6,3 +6,8 @@ export const generateRandomLink = (length = 12) =>{
     }
     return result;
 };
+
+
+// export const generatedUniqueLink = (workshopId:string) =>{
+// return `/form/${workshopId} - ${crypto.randomUUID()}`;
+// }

@@ -11,7 +11,7 @@ import type { StudentSchema } from "../schema/StudentSchema.ts";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
-import FormError from "../../components/FormError.tsx";
+// import FormError from "../../components/FormError.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { useEffect , useState} from "react";
 import { useCertificateGenerator } from "@/services/generateCertificate.ts";
@@ -33,17 +33,17 @@ const FeedbackForm = () => {
     // const [phoneOtpSent, setPhoneOtpSent] = useState(false);
     // const [phoneCode, setPhoneCode] = useState("");
     // const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-    // const [phoneVerified, setPhoneVerified] = useState(false);
+    const [phoneVerified, setPhoneVerified] = useState(false);
     // const [emailOtpSent, setEmailOtpSent] = useState(false);
     // const [emailCode, setEmailCode] = useState("");
-    // const [emailVerified, setEmailVerified] = useState(false);
-    const {register, handleSubmit,setValue,watch, formState:{errors}} = useForm<StudentSchema>({
+    const [emailVerified, setEmailVerified] = useState(false);
+    const {register, handleSubmit,watch,formState:{isSubmitting}} = useForm<StudentSchema>({
         resolver: zodResolver(studentschema),
     });
-    // const email = watch("email");
-    // const phone = watch("phone");
+    const email = watch("email");
+    const phone = watch("phone");
 
-    // load workshop by linkId
+    // load workshop by linkId or fetch workshop
     useEffect(() => {
         const loadWorkshop = async () => {
             const q = query(
@@ -61,6 +61,7 @@ const FeedbackForm = () => {
         };
         loadWorkshop();
     },[linkId]);
+
 
     // send phone otp
     // const sendPhoneOTP = async () => {
@@ -116,9 +117,11 @@ const FeedbackForm = () => {
 
     if(loading) return <p>Loading...</p>;
     if(!workshop) return <p>Invalid link or Form not found</p>
+    // if(workshop.status !== "on")
 
     const onSubmit = async(data: StudentSchema) => {
-    //   if(!phoneVerified || !emailVerified){
+      if(!phoneVerified || !emailVerified) return;
+    // {
     //     alert("Please verify both phone & email before submitting");
     //     return;
     //   }
@@ -195,7 +198,7 @@ const FeedbackForm = () => {
             placeholder="Enter Your Name"
             {...register("studentName")}
             />
-            <FormError message={errors.studentName?.message}/>
+            {/* <FormError message={errors.studentName?.message}/> */}
             </div>
 
             <div>
@@ -206,7 +209,7 @@ const FeedbackForm = () => {
                 placeholder = "Workshop Name"
                 {...register("course")}
                 />
-               <FormError message = {errors. course?.message}/>
+               {/* <FormError message = {errors. course?.message}/> */}
             </div> 
 
              {/*phone & OTP  */}
@@ -218,12 +221,13 @@ const FeedbackForm = () => {
                 {...register("phone")}
                 maxLength={10}
                 />
-
+            {phone?.length === 10 && (
             <OTPInput
             type="phone"
-            target={watch("phone")}
-            onVerified={() => setValue("phoneVerified", true)}
+            target={"phone"}
+            onVerified={() => setPhoneVerified(true)}
             />
+            )}
                 {/* {!phoneVerified && (
                     <div>
                         {!phoneOtpSent ? (
@@ -271,10 +275,12 @@ const FeedbackForm = () => {
 
                     </div>
                 )} */}
+                {email && email.includes("@") && (
                 <OTPInput 
                 type="email" 
                 target={watch("email")}
-                onVerified={() => setValue("emailVerified", true)}/>
+                onVerified={() => setEmailVerified(true)}/>
+                )}
                {/* <FormError message = {errors.email?.message}/> */}
                {/* {emailVerified && <p>Email Verified</p>} */}
             </div>
@@ -287,11 +293,15 @@ const FeedbackForm = () => {
                 placeholder = "Instructions"
                 {...register("feedback")}
                 />
-               <FormError message = {errors. feedback?.message}/>
+               {/* <FormError message = {errors. feedback?.message}/> */}
             </div>
 
             {/* Submit button */}
-           <Button disabled = {!watch("phoneVerified") || !watch("emailVerified")}>Submit Feedback</Button>
+           <Button disabled = {!phoneVerified || !emailVerified || isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit Feedback"}
+            
+            {/* Submit Feedback */}
+            </Button>
         </form>
          </CardContent>
           </Card>
