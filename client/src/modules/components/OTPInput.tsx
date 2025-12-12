@@ -10,8 +10,8 @@ type Props = {
 };
 
 export const OTPInput =({type, target, onVerified} : Props) =>{
-    // const{sent, verified, error, sendOTP, verifyOTP, setSent, setVerified, setError} = useOTP();
-     const{sent, verified, error, sendOTP, verifyOTP,setVerified} = useOTP();
+ // const{sent, verified, error, sendOTP, verifyOTP, setSent, setVerified, setError} = useOTP();
+    const{sent, verified, error, sendOTP, verifyOTP,setVerified} = useOTP();
     const [code, setCode] = useState<string>("");
 
     const handleSend = async() =>{
@@ -56,8 +56,9 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
     <div>
         {!sent && (
             <Button type = "button" onClick={handleSend}>
-            {/* // onClick= {() => sendOTP(type, target)}>Send{type} OTP   */}
-            send {type === "phone" ? "Phone" : "Email"} OTP
+             {/* <Button type = "button" 
+         onClick= {() => sendOTP(type, target)}>Send{type} OTP   */}
+            send {type === "phone" ? "Phone" : "Email"} OTP 
             </Button>
             // className="bg-blue-600 text-white px-3 py-1 rounded"
             // >
