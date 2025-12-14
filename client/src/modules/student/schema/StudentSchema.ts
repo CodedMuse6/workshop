@@ -6,8 +6,8 @@ export const studentschema = z.object({
     phone: z.string(),
     email : z.string().email('Invalid email format'),
     feedback : z.string().min(1, 'Feedback is required'),
-    phoneVerified: z.boolean(),
-    emailVerified: z.boolean(),
+    // phoneVerified: z.boolean(),
+    // emailVerified: z.boolean(),
 });
 
 export type StudentSchema  = z.infer<typeof studentschema>

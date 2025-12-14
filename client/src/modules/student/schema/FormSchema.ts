@@ -6,8 +6,8 @@ export const workshopschema = z.object({
     date : z.string().min(1, 'Date are required'),
     time: z.string().min(1, 'Time are required'),
     instructions : z.string().min(1, "Instructions are required"),
-    templateUrl : z.string().nonempty("Template URL is required"),
-    // formStatus : z.boolean().default(false),
+    templateUrl : z.string().optional(),
+    // formStatus : z.boolean().default(false),.nonempty("Template URL is required"),
     // studentEmail : z.string().email('Invalid email address').min(1, 'Student email is required')
 });
 

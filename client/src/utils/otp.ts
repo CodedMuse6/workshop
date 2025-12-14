@@ -23,7 +23,7 @@ target:string,
 codeInput:string,
 type:"phone" | "email"
 ) =>{
- const otpId = `${type} - ${target}`;
+ const otpId = `${type}-${target}`;
  const snap = await getDoc(doc(db, "otp" , otpId));
 
  if(!snap.exists()) return false;
