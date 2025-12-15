@@ -16,6 +16,7 @@ import { OTPInput } from "@/modules/components/OTPInput.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import { workshopschema, type WorkshopSchema } from "../schema/FormSchema.ts";
 import { saveStudentSubmission } from "./submissions.tsx";
+import FormError from "@/modules/components/FormError.tsx";
 
 
 const FeedbackForm = () => {
@@ -25,45 +26,59 @@ const FeedbackForm = () => {
     const {generateCertificate}  = useCertificateGenerator();
     const [phoneVerified, setPhoneVerified] = useState(false);
     const [emailVerified, setEmailVerified] = useState(false);
-    const {register, handleSubmit,watch,setValue,formState:{isSubmitting}} = useForm<StudentSchema>({
+    const {register, handleSubmit,watch,setValue,formState:{errors, isSubmitting}} = useForm<StudentSchema>({
         resolver: zodResolver(studentschema),
     });
     const email = watch("email");
     const phone = watch("phone");
 
-    const getDefaultTemplateUrl = async()=>{
-     const templateRef = ref(storage,"certificateTemplates/default-template.pdf")
-     try{
-       const url = await getDownloadURL(templateRef);
-       return url;
-     }catch(err){
-        console.error("Default template not found:", err);
-        return "";
-     }
-    };
+    // const getDefaultTemplateUrl = async()=>{
+    //  const templateRef = ref(storage,"certificateTemplates/default-template.pdf")
+    //  try{
+    //    const url = await getDownloadURL(templateRef);
+    //    return url;
+    //  }catch(err){
+    //     console.error("Default template not found:", err);
+    //     return "";
+    //  }
+    // };
 
     // load workshop by linkId or fetch workshop
     useEffect(() => {
-        const loadWorkshop = async () => {
-            const q = query(collection(db, "workshops"),where("linkId" , "==" , linkId));
+        // const loadWorkshop = async () => {
+            if(!linkId) return;
+            const fetchWorkshop = async () =>{
+                const q = query(collection(db, "workshops"),where("linkId" , "==" , linkId));
+        
+            // const q = query(collection(db, "workshops"),where("linkId" , "==" , linkId));
             const snap = await getDocs(q);
+             if(snap.empty){
+                setLoading(false);
+                return;
+             }
 
-            if(!snap.empty){
-                const docRef = snap.docs[0].ref;
-                const docData = snap.docs[0].data() as WorkshopSchema; //as WorkshopSchema
+             setWorkshop(snap.docs[0].data() as WorkshopSchema);
+              setLoading(false);
+            }
+            fetchWorkshop();
+            },[linkId]);   
 
-                // auto-fill templateUrl if missing
-                if(!docData.templateUrl){
+            // if(!snap.empty){
+            //     const docRef = snap.docs[0].ref;
+            //     const docData = snap.docs[0].data() as WorkshopSchema; //as WorkshopSchema
+
+            //     // auto-fill templateUrl if missing
+            //     if(!docData.templateUrl){
                     
-                    const defaultUrl = await getDefaultTemplateUrl();
-                    if(!defaultUrl){
-                        alert("Certificate template missing! Please contact admin");
-                        setLoading(false);
-                        return;
-                    }
-                    await updateDoc(docRef,{templateUrl: defaultUrl});
-                    docData.templateUrl = defaultUrl;
-                }
+                //     const defaultUrl = await getDefaultTemplateUrl();
+                //     if(!defaultUrl){
+                //         alert("Certificate template missing! Please contact admin");
+                //         setLoading(false);
+                //         return;
+                //     }
+                //     await updateDoc(docRef,{templateUrl: defaultUrl});
+                //     docData.templateUrl = defaultUrl;
+                // }
                 // validate firestore data
                 // const parsed = workshopschema.safeParse(docData);
                 // if(!parsed.success){
@@ -74,34 +89,36 @@ const FeedbackForm = () => {
                 //  setWorkshop(parsed.data);
                 //  setValue("course", parsed.data.workshopName);
                 // setWorkshop(docData);
-                setWorkshop(snap.docs[0].data() as WorkshopSchema);
-             }else{
-                alert("Workshop not found")
-             }
-            setLoading(false);
-        };
-        loadWorkshop();
-    },[linkId, setValue]);
+    //             setWorkshop(snap.docs[0].data() as WorkshopSchema);
+    //          }else{
+    //             alert("Workshop not found")
+    //          }
+    //         setLoading(false);
+    //     };
+    //     loadWorkshop();
+    // },[linkId, setValue]);
 
-    if(loading) return <p>Loading...</p>;
-    if(!workshop) return <p>Invalid link or Form not found</p>;
+    // if(loading) return <p>Loading...</p>;
+    // if(!workshop) return <p>Invalid link or Form not found</p>;
 
     const onSubmit = async(data: StudentSchema) => {
         console.log("Submitting form data:", data);
+        if(!workshop) return;
+
       if(!phoneVerified || !emailVerified){
         alert("Please verify phone and email before submitting.");
        return;
       } 
    
-    if(!workshop.templateUrl){
-    // if(!parsed.success){
-        alert("certificate template missing!");
-        return;
-    }
+    // if(!workshop.templateUrl){
+    // // if(!parsed.success){
+    //     alert("certificate template missing!");
+    //     return;
+    // }
     // setWorkshop(parsed.data);
     try{
     //    Generate certificate PDF
-      const pdfBytes = await generateCertificate(workshop.templateUrl,{
+      const pdfBytes = await generateCertificate(workshop.templateUrl!,{
         studentName: data.studentName,
         workshopName: workshop.workshopName,
         collegeName: workshop.collegeName,
@@ -124,6 +141,8 @@ const FeedbackForm = () => {
     };
 
  
+    if(loading) return <p>Loading...</p>;
+    if(!workshop) return <p>Invalid link or Form not found</p>;
 
     return(
        <div className='flex-justify-center items-center min-h-screen bg-gray-50'>
@@ -149,6 +168,7 @@ const FeedbackForm = () => {
             placeholder="Enter Your Name"
             {...register("studentName")}
             />
+            <FormError message = {errors. studentName?.message}/>
             </div>
 
             <div>
@@ -157,8 +177,8 @@ const FeedbackForm = () => {
                 id = "course"
                 value = {workshop.workshopName}
                 readOnly
-                placeholder = "Workshop Name"
-                {...register("course")}
+                // placeholder = "Workshop Name"
+                 {...register("course")}
                 />
             </div> 
 
@@ -166,11 +186,12 @@ const FeedbackForm = () => {
             <div>
                 <Label htmlFor = "phone">Phone</Label>
                 <Input
+                type="text"
                 id = "phone"
                 {...register("phone")}
                 maxLength={10}
                 />
-            {phone?.length === 10 && (
+            {phone?.length === 10 && !phoneVerified && (
             <OTPInput
             type="phone"
             target={phone}
@@ -178,6 +199,7 @@ const FeedbackForm = () => {
             />
             )}
             {phoneVerified && <p className="text-green-600">Phone Verified</p>}
+            {/* {phoneVerified && <FormError message = {errors. phone?.message}/> } */}
             </div> 
 
             {/* Email & OTP */}
@@ -207,7 +229,7 @@ const FeedbackForm = () => {
             </div>
 
             {/* Submit button */}
-           <Button disabled = {!phoneVerified || !emailVerified || isSubmitting}>
+           <Button type = "submit" disabled = {!phoneVerified || !emailVerified || isSubmitting}>
             {isSubmitting ? "Submitting..." : "Submit Feedback"}
             </Button>
         </form>

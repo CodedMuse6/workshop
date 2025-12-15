@@ -81,7 +81,7 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
              {/* <Button type = "button" 
          onClick= {() => sendOTP(type, target)}>Send{type} OTP   */}
             {/* send {type === "phone" ? "Phone" : "Email"} OTP  */}
-            Send OTP
+             Send OTP
             </Button>
             // className="bg-blue-600 text-white px-3 py-1 rounded"
             // >
@@ -94,9 +94,9 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
             <div className="flex space-x-2">
                 <Input type = "text" value = {codeInput}
                 onChange = {(e) => setCodeInput(e.target.value)}
-                placeholder = "Enter OTP"
-                // className = "border p-2 rounded w-full"
-                />
+                placeholder = "Enter OTP"/>
+                {/* // className = "border p-2 rounded w-full" */}
+                {/* /> */}
             <Button type="button" onClick={handleVerify}>
             {/* // className="bg-green-600 text-white px-3 py-1 rounded"
             // onClick={handleVerify}
