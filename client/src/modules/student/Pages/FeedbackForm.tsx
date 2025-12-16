@@ -1,7 +1,7 @@
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {db, storage} from "../../../config/Firebase.ts";
-import {getDocs, collection,query, where, updateDoc} from "firebase/firestore";
+import {db} from "../../../config/Firebase.ts"; //storage
+import {getDocs, collection,query, where, addDoc} from "firebase/firestore"; //setDoc,
 import {useParams} from "react-router-dom"
 import { studentschema } from "../schema/StudentSchema.ts";
 import type { StudentSchema } from "../schema/StudentSchema.ts";
@@ -9,13 +9,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
-import { useEffect , useState} from "react";
-import { useCertificateGenerator } from "@/services/generateCertificate.ts";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useEffect , useState,} from "react"; //useRef,
+// import { useCertificateGenerator } from "@/services/generateCertificate.ts";
+// import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { OTPInput } from "@/modules/components/OTPInput.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
-import { workshopschema, type WorkshopSchema } from "../schema/FormSchema.ts";
-import { saveStudentSubmission } from "./submissions.tsx";
+import {type WorkshopSchema } from "../schema/FormSchema.ts"; //workshopschema, 
+// import { saveStudentSubmission } from "./submissions.tsx";
 import FormError from "@/modules/components/FormError.tsx";
 
 
@@ -23,25 +23,15 @@ const FeedbackForm = () => {
     const {linkId} = useParams();
     const [workshop, setWorkshop] = useState<WorkshopSchema | null>(null); 
     const [loading, setLoading] = useState<boolean>(true);
-    const {generateCertificate}  = useCertificateGenerator();
+    // const {generateCertificate}  = useCertificateGenerator();
     const [phoneVerified, setPhoneVerified] = useState(false);
     const [emailVerified, setEmailVerified] = useState(false);
-    const {register, handleSubmit,watch,setValue,formState:{errors, isSubmitting}} = useForm<StudentSchema>({
+    // const[isSubmitting, setIsSubmitting] = useState(false);
+    const {register, handleSubmit,watch,formState:{errors, isSubmitting}} = useForm<StudentSchema>({
         resolver: zodResolver(studentschema),
     });
     const email = watch("email");
     const phone = watch("phone");
-
-    // const getDefaultTemplateUrl = async()=>{
-    //  const templateRef = ref(storage,"certificateTemplates/default-template.pdf")
-    //  try{
-    //    const url = await getDownloadURL(templateRef);
-    //    return url;
-    //  }catch(err){
-    //     console.error("Default template not found:", err);
-    //     return "";
-    //  }
-    // };
 
     // load workshop by linkId or fetch workshop
     useEffect(() => {
@@ -49,8 +39,6 @@ const FeedbackForm = () => {
             if(!linkId) return;
             const fetchWorkshop = async () =>{
                 const q = query(collection(db, "workshops"),where("linkId" , "==" , linkId));
-        
-            // const q = query(collection(db, "workshops"),where("linkId" , "==" , linkId));
             const snap = await getDocs(q);
              if(snap.empty){
                 setLoading(false);
@@ -103,12 +91,46 @@ const FeedbackForm = () => {
 
     const onSubmit = async(data: StudentSchema) => {
         console.log("Submitting form data:", data);
-        if(!workshop) return;
-
-      if(!phoneVerified || !emailVerified){
+         
+        try{
+         if(!phoneVerified || !emailVerified){
         alert("Please verify phone and email before submitting.");
        return;
       } 
+        //  isSubmitting(true);
+
+    //   save feedback data to firebase
+    const feedbackRef = await addDoc(collection(db,'feedbacks'),{
+        ...data,
+        linkId,
+        submittedAt : new Date(),
+    });
+    console.log('Feedback saved with ID:' , feedbackRef.id);
+
+    // generate certificate for the student
+//    const pdfBytes = await generateCertificate(workshopDetails, data.studentName);
+//     const certRef = ref(storage, `certificates/${linkId}/${data.studentName}.pdf`);
+//     await uploadBytes(certRef, pdfBytes); 
+//     const certificateUrl = await getDownloadURL(certRef);
+
+
+
+    // const pdfBytes = await generateCertificate(data.studentName);
+    // await sendEmail(data.email, data.studentName, pdfBytes);
+
+    alert('feedback submitted successfully!');
+    // isSubmitting(true);
+        }catch(error){
+            console.error('Error submitting feedback:', error);
+            // isSubmitting(false);
+        }
+
+        //     if(!workshop) return;
+
+    //   if(!phoneVerified || !emailVerified){
+    //     alert("Please verify phone and email before submitting.");
+    //    return;
+    //   } 
    
     // if(!workshop.templateUrl){
     // // if(!parsed.success){
@@ -116,29 +138,29 @@ const FeedbackForm = () => {
     //     return;
     // }
     // setWorkshop(parsed.data);
-    try{
-    //    Generate certificate PDF
-      const pdfBytes = await generateCertificate(workshop.templateUrl!,{
-        studentName: data.studentName,
-        workshopName: workshop.workshopName,
-        collegeName: workshop.collegeName,
-        date:workshop.date,
-        linkId: linkId!
-      });
+    // try{
+    // //    Generate certificate PDF
+    //   const pdfBytes = await generateCertificate(workshop.templateUrl!,{
+    //     studentName: data.studentName,
+    //     workshopName: workshop.workshopName,
+    //     collegeName: workshop.collegeName,
+    //     date:workshop.date,
+    //     linkId: linkId!
+    //   });
 
     //   upload certificate
-    const certRef = ref(storage, `certificates/${linkId}/${data.studentName}.pdf`);
-    await uploadBytes(certRef, pdfBytes);
-    const certificateUrl = await getDownloadURL(certRef);
+    // const certRef = ref(storage, `certificates/${linkId}/${data.studentName}.pdf`);
+    // await uploadBytes(certRef, pdfBytes); 
+    // const certificateUrl = await getDownloadURL(certRef);
 
     // save submission
-    await saveStudentSubmission(linkId!, data, certificateUrl)
-    alert("Submitted successfully! Certificate generated:" + certificateUrl);
-    } catch(err){
-        console.error("Submission error:", err);
-        alert("An error occured during submission.");
-    }
-    };
+    // await saveStudentSubmission(linkId!, data, certificateUrl)
+    // alert("Submitted successfully! Certificate generated:" + certificateUrl);
+    // } catch(err){
+    //     console.error("Submission error:", err);
+    //     alert("An error occured during submission.");
+    // }
+     };
 
  
     if(loading) return <p>Loading...</p>;

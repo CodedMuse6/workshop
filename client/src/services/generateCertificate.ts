@@ -5,6 +5,7 @@ type CertData = {
     workshopName : string;
     collegeName : string;
     date : string;
+    linkId: string;
 };
 
 export const useCertificateGenerator = () =>{
@@ -97,11 +98,12 @@ export const useCertificateGenerator = () =>{
 //     page.drawText(workshopName, {x:200, y:height-350, size:25});
 //     page.drawText(course, {x:200, y:height-400, size:20});
 
-//     const pdfBytes = await pdfDoc.save();
+//     // const pdfBytes = await pdfDoc.save();
 
 //     // upload the generated certificate PDF to Firebase Storage
 //     const certificateRef = ref(storage, `certificates/${linkId}_${studentName}_certificate.pdf`);
-//     await certificateRef.put(new Blob([pdfBytes], {type: 'application/pdf'}));
+//     // await certificateRef.put(new Blob([pdfBytes], {type: 'application/pdf'}));
+//     await pdfDoc.save();
     
 //     const certificateUrl = await getDownloadURL(certificateRef);
 
