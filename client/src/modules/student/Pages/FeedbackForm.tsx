@@ -108,6 +108,7 @@ const FeedbackForm = () => {
     console.log('Feedback saved with ID:' , feedbackRef.id);
 
     // generate certificate for the student
+    const certUrl = await generateCertificate("/certificate-templates/sample.pdf", data);
 //    const pdfBytes = await generateCertificate(workshopDetails, data.studentName);
 //     const certRef = ref(storage, `certificates/${linkId}/${data.studentName}.pdf`);
 //     await uploadBytes(certRef, pdfBytes); 
