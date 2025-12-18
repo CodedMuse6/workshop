@@ -1,50 +1,70 @@
-import {PDFDocument, rgb} from "pdf-lib";
+// import {PDFDocument, rgb} from "pdf-lib";
 
-type CertData = {
-    studentName : string;
-    workshopName : string;
-    collegeName : string;
-    date : string;
-    linkId: string;
-};
+// type CertData = {
+//     studentName : string;
+//     workshopName : string;
+//     collegeName : string;
+//     date : string;
+//     linkId: string;
+// };
 
-export const useCertificateGenerator = () =>{
-    const generateCertificate = async(templateUrl: string, data:CertData) : Promise<Uint8Array> => {
-        const response = await fetch(templateUrl);
-    // .then((res) => 
-    //         res.arrayBuffer()
-    // );
+// export const useCertificateGenerator = () =>{
+//     const generateCertificate = async(templateUrl: string, data:CertData) : Promise<Uint8Array> => {
+//         const response = await fetch(templateUrl);
+//     // .then((res) => 
+//     //         res.arrayBuffer()
+//     // );
 
-    if(!response.ok){
-        throw new Error("Failed to fetch certificate template");
-    }
-    const templateBytes  = await response.arrayBuffer();
+//     if(!response.ok){
+//         throw new Error("Failed to fetch certificate template");
+//     }
+//     const templateBytes  = await response.arrayBuffer();
 
-    // Load PDF correctly
-    const pdfDoc = await PDFDocument.load(templateBytes);
-    const pages = pdfDoc.getPages()
-    if(PageSwapEvent.length === 0){
-        throw new Error("PDF has no pages")
-    }
-    const page = pages[0];
+//     // Load PDF correctly
+//     const pdfDoc = await PDFDocument.load(templateBytes);
+//     const pages = pdfDoc.getPages()
+//     if(PageSwapEvent.length === 0){
+//         throw new Error("PDF has no pages")
+//     }
+//     const page = pages[0];
 
-    // const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+//     // const font = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-    page.drawText(data.studentName,{
-        x:250,
-        y:300,
-        size: 24,
-        // font,
-        color: rgb(0,0,0),
-    });
-    page.drawText(data.workshopName,{x:250, y:260, size:14}); //font
-    page.drawText(data.collegeName, {x:250,y:240, size:14});  // font
-    page.drawText(data.date,{x:250, y:220, size:14}); //font
+//     page.drawText(data.studentName,{
+//         x:250,
+//         y:300,
+//         size: 24,
+//         // font,
+//         color: rgb(0,0,0),
+//     });
+//     page.drawText(data.workshopName,{x:250, y:260, size:14}); //font
+//     page.drawText(data.collegeName, {x:250,y:240, size:14});  // font
+//     page.drawText(data.date,{x:250, y:220, size:14}); //font
+
+//     const pdfBytes = await pdfDoc.save();
+//     return pdfBytes;
+//     }
+//     return{generateCertificate};
+// }
+
+
+import {PDFDocument} from "pdf-lib";
+import {storage} from "/firebase";
+import {ref, uploadBytes, getDownloadURL} from "firebase/storage";
+
+export const generateCertificate = async(templateUrl: string, studentData: any) => {
+    const response = await fetch(templateUrl);
+    const existingPdfBytes = await response.arrayBuffer();
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+    const page = pdfDoc.getPages()[0];
+    page.drawText(studentData.name, {x:200, y:300, size:24});
 
     const pdfBytes = await pdfDoc.save();
-    return pdfBytes;
-    }
-    return{generateCertificate};
+    const storageRef = ref(storage, `generated-certificates/${studentName.name}.pdf`);
+    await uploadBytes(storageRef, pdfBytes);
+
+    return getDownloadURL(storageRef);
 }
 
 
