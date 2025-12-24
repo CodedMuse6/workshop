@@ -20,15 +20,12 @@ const AdminLogin = () =>{
 
     const onSubmit =  async(data:LoginSchema) => {
         try{
-        //  await logIn(data.email, data.password);
         const role = await logIn(data.email, data.password);
         if(role === "admin") navigate("/admin");
         else navigate("/");
-        //   navigate('/admin');
         } catch(error){
             console.error("Login failed", error);
             alert("Login failed! Check your credentials.")
-        //  console.log('Login failed please try again', error);
         };
     };
 
@@ -37,9 +34,6 @@ const AdminLogin = () =>{
         if(user?.role === "admin"){
             navigate("/admin");
         }
-        // if(user?.role === "user"){
-        //     navigate("/");
-        // }
     },[user, navigate]);
 
     if(user){

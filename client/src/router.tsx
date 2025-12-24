@@ -1,11 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
 import AdminLogin from "./modules/auth/pages/AdminLogin";
-// import AdminSignUp from "./modules/auth/pages/AdminSignUp";
 import { AdminDashboard } from "./modules/auth/pages/AdminDashboard";
 import CreateForm from "./modules/auth/pages/CreateForm";
-// import  {ViewForms}  from "./modules/auth/pages/ViewForms";
 import FeedbackForm  from "./modules/student/Pages/FeedbackForm";
-// import { SubmissionSuccess } from "./modules/student/Pages/SubmissionSuccess";
 import ProtectedRoute from "./modules/components/ProtectedRoute";
 import Home from "./pages/Home";
 import Forbidden from "./modules/auth/pages/Forbidden";
@@ -23,10 +20,6 @@ export const router = createBrowserRouter([
         path:"/admin/login",
         element:<AdminLogin/>
     },
-    // {
-    //     path:"/admin/signup",
-    //     element:<AdminSignUp/>
-    // },
     {
         path:"/admin",
         element:(
@@ -43,20 +36,8 @@ export const router = createBrowserRouter([
             </ProtectedRoute>
         )
     },
-    // {
-    //     path:"/admin/forms",
-    //     element:(
-    //         <ProtectedRoute role = "admin">
-    //             <ViewForms />
-    //         </ProtectedRoute>
-    //     )
-    // },
     {
         path:"/form/:linkId",
         element:<FeedbackForm />
     },
-    // {
-    //     path:"/submitted",
-    //     element:<SubmissionSuccess/>
-    // }
 ])

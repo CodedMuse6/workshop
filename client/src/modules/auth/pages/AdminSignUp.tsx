@@ -21,22 +21,13 @@ const {register, handleSubmit, formState:{errors}} = useForm<AuthSchema>({resolv
 
 const onSubmit = async(data:AuthSchema) => {
     try{
-        // const role = await signUp(data.email, data.password, data.role);
          await signUp(data.email, data.password, "admin" ); 
-        // navigate(role === "admin" ? "/admin" : "/");
-        navigate("/admin/login");
-        // navigate("/login");
-        // navigate("/");
+         navigate("/admin/login");
     } catch(error:unknown){
         if(error instanceof Error && error.message.includes("Admin already exists")){
-          alert("Admin account already created!No more admins allowed.");
-        // if(error.message.includes("Admin already exists")){
-        //   alert("Admin account already created!No more admins allowed.");
-        // }
-        // console.log('Signup failed', error);  
+          alert("Admin account already created!No more admins allowed.");  
     } else{
         console.error("SIgnup failed", error);
-        // console.log("Signup failed");
     } 
     }
 };

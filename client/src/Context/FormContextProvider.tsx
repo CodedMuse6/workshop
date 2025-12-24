@@ -10,16 +10,8 @@ import { db } from "@/config/Firebase.ts";
 
 const FormContextProvider = ({children} : {children : ReactNode}) => {
 const {user} = useAuth();
-// const [formStatus, setFormStatus] = useState(false);
 const [formData, setFormData] = useState<WorkshopData[]>([]);
-    // collegeName : "",
-    // workshopName : "",
-    // date : "",
-    // time : "",
-    // instructions : "",
-    // studentEmail : "",
-// });
-
+   
 const fetchForms = useCallback(async() =>{
     if(!user) return;
     const q = query(collection(db, "workshops"), where("createdBy", "==", user.uid));
@@ -44,23 +36,13 @@ const createForm = useCallback(async(form:Omit<WorkshopData, "id" | "linkId" | "
 const toggleStatus = useCallback(async(formId: string, newStatus: "on" | "off") => {
     const docRef = doc(db, "workshops", formId);
     await updateDoc(docRef, {status: newStatus});
-    await fetchForms(); //refresh after update
-    // const docRef = collection(db, "workshops").doc(formId);
-    // await db.collection("workshops").doc(formId).update({status: newStatus});
-    // fetchForms();
+    await fetchForms(); 
 },[fetchForms]);
 
 useEffect(() => {
     if(user) fetchForms();
 }, [user, fetchForms]);
 
-// const updateFormData = (data:WorkshopData) =>{
-//     setFormData(data);
-// };
-
-// const toggleFormStatus = () =>{
-//     setFormStatus((prevStatus) => !prevStatus);
-// };
 
 return(
     <FormContext.Provider value = {{formData, fetchForms, createForm, toggleStatus }}> 

@@ -16,11 +16,6 @@ export type WorkshopData = {
 }
 
 export type WorkshopContextType = {
-    // formData : WorkshopData;
-    // updateFormData : (data : WorkshopData) => void;
-    // formStatus : boolean;
-    // toggleFormStatus : () => void;
-
     formData : WorkshopData[];
     createForm : (form: Omit<WorkshopData, "id" | "linkId" | "createdAt" | "createdBy">) => Promise<void>;
     fetchForms : () => Promise<void>;

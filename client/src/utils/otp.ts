@@ -34,8 +34,6 @@ type:"phone" | "email"
 //  Compare values correctly
  if(data.code !== codeInput) return false;
  if(Date.now() > data.expiresAt) return false;
-//  if(data.expiresAt < Date.now()) return false;
-
  await deleteDoc(doc(db, "otp", otpId));
  return true;
 };

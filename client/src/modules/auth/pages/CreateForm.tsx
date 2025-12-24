@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import FormError from "@/modules/components/FormError";
 import { Card, CardContent, CardHeader, CardTitle  } from "@/components/ui/card";
+import  { v4 as uuidv4} from "uuid";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/config/Firebase";
 
 
 const CreateForm = () => {
@@ -17,18 +20,22 @@ const CreateForm = () => {
     });
 
     const onSubmit = async(data: WorkshopSchema) => {
-        // const formDataToCreate = {
-        //     ...data,
-        //     status: "off", //default status
-        //     studentEmail: "", //default empty
-        // };
-        // await createForm(formDataToCreate);
-        await createForm(data);
-        // toast({
-        //     title: "Form Created!",
-        //     description : "Workshop form is ready and active.",
-        // });
-        alert("Workshop form created successfully!");
+        try{
+            // genearate unique link
+            const uniqueLink = ` http://localhost:5173/feedback/${uuidv4()}`;
+            const docRef = await addDoc(collection(db, "workshops"),{
+              ...data,
+              link:uniqueLink,
+              createdAt: new Date(),  
+            });
+            alert("Workshop created! Feedback link: " + uniqueLink)
+        } catch(err){
+         console.error(err);
+        }
+      
+        // await createForm(data);
+       
+        // alert("Workshop form created successfully!");
     };
 
     return(

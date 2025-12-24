@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// import { useOTP } from "./useOTP";
 import { useState } from "react";
 import { sendOTP, verifyOTP } from "@/utils/otp";
 
@@ -11,8 +10,6 @@ type Props = {
 };
 
 export const OTPInput =({type, target, onVerified} : Props) =>{
- // const{sent, verified, error, sendOTP, verifyOTP, setSent, setVerified, setError} = useOTP();
-    // const{sent, verified, error, sendOTP, verifyOTP,setVerified} = useOTP();
     const[sent, setSent] = useState(false);
     const[verified, setVerified] = useState(false);
     const [codeInput, setCodeInput] = useState<string>("");
@@ -27,18 +24,6 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
          console.error(err);
          setStatus("Failed to send OTP");
         }
-     
-    //      try{
-    //         await sendOTP(type, target);
-    //         setSent(true);
-    //         setError("");
-    //      }catch(e:unknown){
-    //          if(e instanceof Error){
-    //           setError(e.message);
-    //         } else{
-    //             setError("An unknown error occurred");
-    //         }
-    //      }
      };
 
      const handleVerify = async() => {
@@ -58,35 +43,13 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
         }
        
     };
-    //     try{
-    //     const success =  await verifyOTP(type,target,code);
-    //     if(success !== false){
-    //        setVerified(true);
-    //        onVerified();
-    //     } 
-    //     }catch(e:unknown){
-    //         if(e instanceof Error){
-    //           setError(e.message);
-    //         } else{
-    //             setError("An unknown error occurred");
-    //         }
-            
-    //     }
-    //  };
 
   return(
     <div>
         {!sent && (
             <Button type="button" onClick={handleSend}>
-             {/* <Button type = "button" 
-         onClick= {() => sendOTP(type, target)}>Send{type} OTP   */}
-            {/* send {type === "phone" ? "Phone" : "Email"} OTP  */}
              Send OTP
             </Button>
-            // className="bg-blue-600 text-white px-3 py-1 rounded"
-            // >
-            //     Send{type === "phone" ? "phone" : "Email"} OTP
-            // </Button>
          )}
 
         {sent && !verified && (
@@ -95,19 +58,10 @@ export const OTPInput =({type, target, onVerified} : Props) =>{
                 <Input type = "text" value = {codeInput}
                 onChange = {(e) => setCodeInput(e.target.value)}
                 placeholder = "Enter OTP"/>
-                {/* // className = "border p-2 rounded w-full" */}
-                {/* /> */}
             <Button type="button" onClick={handleVerify}>
-            {/* // className="bg-green-600 text-white px-3 py-1 rounded"
-            // onClick={handleVerify}
-            // onClick={async () => {
-            //     const ok = await verifyOTP(type,target, code)
-            //     if(ok) onVerified();
-            // }}> */}
             Verify
             </Button>
             </div>
-            {/* {error && <p className="text-red-600 text-sm">{error}</p>} */}
             </>
         )}
         {verified && <p className="text-green-600 font-semibold">{status}</p>}
