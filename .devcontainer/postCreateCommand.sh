@@ -1,5 +1,20 @@
 #!/bin/bash
 set -e
+
+echo "Installing Firebase CLI..."
+npm install -g firebase-tools
+
+echo "Installing project dependencis..."
+npm install
+
+# Install functions dependencies if folder exists
+if[ -d "functions" ]; then
+cd functions
+npm install
+cd..
+fi
+
+
 echo "Creating client/.env from GitHub Codespaces secrets..."
 
 cat <<EOF > ./client/.env
