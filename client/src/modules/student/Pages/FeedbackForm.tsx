@@ -1,7 +1,7 @@
 import {useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {auth, db} from "../../../config/Firebase.ts"; 
-import {getDocs, collection,query, where, addDoc, setDoc, doc} from "firebase/firestore"; 
+import {db} from "../../../config/Firebase.ts"; 
+import {getDocs, collection,query, where, setDoc, doc} from "firebase/firestore"; 
 import {useParams} from "react-router-dom"
 import { studentschema } from "../schema/StudentSchema.ts";
 import type { StudentSchema } from "../schema/StudentSchema.ts";
@@ -10,14 +10,14 @@ import { Button } from "@/components/ui/button.tsx";
 import { Label } from "@/components/ui/label.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { useEffect , useState,} from "react"; 
-import { OTPInput } from "@/modules/components/OTPInput.tsx";
 import { Textarea } from "@/components/ui/textarea.tsx";
 import {type WorkshopSchema } from "../schema/FormSchema.ts";
 import FormError from "@/modules/components/FormError.tsx";
-import { RecaptchaVerifier, sendEmailVerification, signInWithPhoneNumber } from "firebase/auth";
+import { PhoneVerification } from "@/modules/components/PhoneVerification.tsx";
+import { EmailVerification } from "@/modules/components/EmailVerification.tsx";
 
 
-const FeedbackForm = () => {
+export const FeedbackForm = () => {
     const {linkId} = useParams();
     const [workshop, setWorkshop] = useState<WorkshopSchema | null>(null); 
     const [loading, setLoading] = useState<boolean>(true);
@@ -45,23 +45,10 @@ const FeedbackForm = () => {
             fetchWorkshop();
             },[linkId]);   
 
-    // verifyPhone
-    const verifyPhone = async(phone: string) => {
-        const recaptcha = new RecaptchaVerifier("recaptcha-container", {}, auth);
-        const confirmation = await signInWithPhoneNumber(auth, phone, recaptcha);
-        const code = prompt("Enter OTP sent to your phone:");
-        await confirmation.confirm(code!);
-        setPhoneVerified(true);
-    }
 
-    // verifyEmail
-    const verifyEmail = async(email: string) =>{
-        const userCredential = await auth.createUserWithEmailAndPassword(email, "temporaryPassword123!");
-        await sendEmailVerification(userCredential.user);
-        alert("Verification email sent! Please verify your email and then submit the form.");
-    }
 
     const onSubmit = async(data: StudentSchema) => {
+        // e.preventDefault();
         console.log("Submitting form data:", data);
          
         try{
@@ -70,7 +57,7 @@ const FeedbackForm = () => {
        return;
       } 
 
-    //save feedback data to firebase
+//save feedback data to firebase
     // const feedbackRef = await addDoc(collection(db,'feedbacks'),{
     //     ...data,
     //     linkId,
@@ -81,13 +68,14 @@ const FeedbackForm = () => {
     console.log('Feedback saved with ID:' , feedbackRef.id);
 
     //generate certificate for the student
-    const certUrl = await generateCertificate("/certificate-templates/sample.pdf", data);
+    // const certUrl = await generateCertificate("/certificate-templates/sample.pdf", data);
 
     alert('feedback submitted successfully! Certificate will be generated automatically.');
         }catch(error){
             console.error('Error submitting feedback:', error);
         }
      };
+     
 
  
     if(loading) return <p>Loading...</p>;
@@ -140,9 +128,9 @@ const FeedbackForm = () => {
                 maxLength={10}
                 />
             {phone?.length === 10 && !phoneVerified && (
-            <OTPInput
-            type="phone"
-            target={phone}
+            <PhoneVerification
+            // type="phone"
+            // target={phone}
             onVerified={() => setPhoneVerified(true)}
             />
             )}
@@ -158,9 +146,9 @@ const FeedbackForm = () => {
                 {...register("email")}
                 />
                 {email && email.includes("@") && (
-                <OTPInput 
-                type="email" 
-                target={email}
+                <EmailVerification
+                // type="email" 
+                // target={email}
                 onVerified={() => setEmailVerified(true)}/>
                 )}
                  {emailVerified && <p className="text-green-600">Email Verified</p>}
@@ -182,11 +170,6 @@ const FeedbackForm = () => {
         </form>
          </CardContent>
           </Card>
+           <div id = "receptcha-container"></div>
           </div>
-    )
-};
-
-export default FeedbackForm;
-
-
-
+)};       

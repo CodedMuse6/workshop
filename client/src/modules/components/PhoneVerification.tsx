@@ -1,75 +1,61 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { confirmOTP, sendOTP } from "@/services/PhoneVerificationService";
 import { useState } from "react";
-import { sendOTP, verifyOTP } from "@/utils/otp";
+
 
 type Props = {
-    type: "phone" | "email";
-    target: string;
     onVerified: () => void;
 };
 
-export const OTPInput =({type, target, onVerified} : Props) =>{
-    const[sent, setSent] = useState(false);
-    const[verified, setVerified] = useState(false);
-    const [codeInput, setCodeInput] = useState<string>("");
-    const[status, setStatus] = useState("");
+export const PhoneVerification =({onVerified} : Props) =>{  
+    const [phone, setPhone] = useState("");
+    const [otpCode, setOtpCode] = useState("");
+    const [confirmationResult, setConfirmationResult] = useState<any>(null);
+    const [message, setMessage] = useState("");
 
-    const handleSend = async() =>{
-        try{
-        await sendOTP(target, type);
-        setSent(true);
-        setStatus("OTP sent! Check console (dev).");
-        } catch(err){
-         console.error(err);
-         setStatus("Failed to send OTP");
-        }
-     };
+ 
+      // send OTP
+         const handleSendOTP = async() => {
+             try {
+                 const result = await sendOTP(phone);
+                 setConfirmationResult(result);
+                 setMessage("OTP sent! Check your phone.");
+             } catch (err) {
+                console.error(err);
+                 setMessage("err.message,Failed to send OTP");
+             }
+         };
 
-     const handleVerify = async() => {
-        try{
-         console.log("Verifying", type , codeInput);
-          const ok = await verifyOTP(target,codeInput,type);
-        if(ok){
-           setVerified(true);
-           onVerified();
-           setStatus("verified successfully");
-        } else{
-            setStatus("Invalid OTP or expired OTP");
+     // confirm OTP
+      const handleConfirmOTP = async () => {
+        if (!confirmationResult) return;
+        try {
+        await confirmOTP(confirmationResult, otpCode);
+        setMessage("Phone verified");
+        onVerified(); //notify parent component
+        } catch (err) {
+            console.error(err);
+            setMessage("err.message,Phone Verification error");
         }
-        } catch(err){
-        console.error(err);
-        setStatus("Verification error");
-        }
-       
     };
 
   return(
     <div>
-        {!sent && (
-            <Button type="button" onClick={handleSend}>
-             Send OTP
-            </Button>
-         )}
-
-        {sent && !verified && (
-            <>
-            <div className="flex space-x-2">
-                <Input type = "text" value = {codeInput}
-                onChange = {(e) => setCodeInput(e.target.value)}
+         <input type = "tel" value = {phone} onChange = {(e) => setPhone(e.target.value)} placeholder="+91"/>
+          <button onClick={handleSendOTP}>Send OTP</button>
+            <Input type = "text" value = {otpCode}
+                onChange = {(e) => setOtpCode(e.target.value)}
                 placeholder = "Enter OTP"/>
-            <Button type="button" onClick={handleVerify}>
-            Verify
+            <Button type="button" onClick={ handleConfirmOTP}>
+            Confirm OTP
             </Button>
-            </div>
-            </>
-        )}
-        {verified && <p className="text-green-600 font-semibold">{status}</p>}
-        {!verified && <p className="text-green-600 font-semibold">{status}</p>}
+            <p>{message}</p>
+            <div id = "recaptcha"></div>
     </div>
-  );
-}
-
+);
+};
+       
 
 
 
