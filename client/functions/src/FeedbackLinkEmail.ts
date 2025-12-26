@@ -2,7 +2,7 @@ import * as functions from "firebase-functions";
 import * as sgmail from "@sendgrid/mail";
 
 // set SendGrid Api key
-sgmail.setApiKey("Your_SENDGRID_API_KEY");
+sgmail.setApiKey("Your_SENDGRID_API_KEY"); // process.env.SENDGRID_KEY
 
 // define a type for the incoming request data
 interface FeedbackData{
@@ -27,7 +27,7 @@ export const sendFeedbackLink = functions.https.onCall(async (data:
   const msg = {
     to: email,
     from: "your_email@example.com",
-    subject: "Your Workshop Feedback Link",
+    subject: "Your Workshop Feedback Form Link",
     text: `Click here to give feedback: http://localhost:5173/feedback/${link}`,
   };
 

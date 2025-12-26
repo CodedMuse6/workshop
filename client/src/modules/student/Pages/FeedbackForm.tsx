@@ -17,7 +17,7 @@ import { PhoneVerification } from "@/modules/components/PhoneVerification.tsx";
 import { EmailVerification } from "@/modules/components/EmailVerification.tsx";
 
 
-export const FeedbackForm = () => {
+const FeedbackForm = () => {
     const {linkId} = useParams();
     const [workshop, setWorkshop] = useState<WorkshopSchema | null>(null); 
     const [loading, setLoading] = useState<boolean>(true);
@@ -173,3 +173,5 @@ export const FeedbackForm = () => {
            <div id = "receptcha-container"></div>
           </div>
 )};       
+
+export default FeedbackForm;

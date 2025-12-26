@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import {Link, useNavigate} from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx';
 import { useAuth } from "@/Context/AuthContext";
+import { toast } from "sonner";
 
 export const AdminDashboard = () =>{
 const {formData, fetchForms, toggleStatus} = useFormDataContext();
@@ -49,21 +50,47 @@ return(
                 </tr>
             </thead>
             <tbody>
-                {formData.map((form) => (
+                {formData.map((form) => {
+                    const formLink = form.status === "on" && form.linkId ? `${window.location.origin}/form/${form.linkId}` : null;
+                    return(
                     <tr key={form.id}>
                      <td>{form.workshopName}</td>
                      <td>{form.collegeName}</td>
                      <td>{form.date}</td>
                      <td>{form.status}</td>
-                     <td>{form.status === "on" ? `${window.location.origin}/form/${form.linkId}` : "Inactive"}</td>
+                     <td>{form.status === "on" && formLink ? (
+                        <div>
+                            <a
+                            href={formLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{color:"blue", textDecoration:"underline"}}
+                            >
+                                {formLink}
+                            </a>
+                            <Button onClick={() => {navigator.clipboard.writeText(formLink);
+                                toast.success("Link copied");
+                            }}
+                                style={{fontSize: "12px"}}>
+                                    Copy Link
+                                </Button>
+                            </div>
+                     ):(
+                        <span style={{color: "red"}}>Inactive</span>
+                     )} </td>
+                     {/* <td>{form.status === "on" ? <a href={`/form/${form.linkId}`}>open Form</a> : "Inactive"}</td> */}
+                     {/* `${window.location.origin}/form/${form.linkId}`}*/}
                     <td>
                         <Button variant = {form.status === "on" ? "destructive" : "default"}
-                         onClick = {() => toggleStatus(form.id!, form.status === "on" ? "off" : "on")}>
+                         onClick = {async () => { await toggleStatus(form.id!, form.status === "on" ? "off" : "on");
+                            toast.success(`Form turned ${form.status === "on" ? "OFF" : "ON"}`);
+                         }}>
                             {form.status === "on" ? "Turn off" : "Turn On"}
                         </Button>
                     </td>
                     </tr>
-                ))}
+                );
+                })}
             </tbody>
         </table>
 </CardContent>

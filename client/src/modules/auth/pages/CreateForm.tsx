@@ -20,22 +20,23 @@ const CreateForm = () => {
     });
 
     const onSubmit = async(data: WorkshopSchema) => {
-        try{
-            // genearate unique link
-            const uniqueLink = ` http://localhost:5173/feedback/${uuidv4()}`;
-            const docRef = await addDoc(collection(db, "workshops"),{
-              ...data,
-              link:uniqueLink,
-              createdAt: new Date(),  
-            });
-            alert("Workshop created! Feedback link: " + uniqueLink)
-        } catch(err){
-         console.error(err);
-        }
+        // try{
+        //     // genearate unique link
+        //     // const uniqueLink = ` http://localhost:5173/feedback/${uuidv4()}`;
+        //     const docRef = await addDoc(collection(db, "workshops"),{
+        //       ...data,
+        //       link:uniqueLink,
+        //       createdAt: new Date(),  
+        //     });
+        //     alert("Workshop created! Feedback link: " + uniqueLink)
+        // } catch(err){
+        //  console.error(err);
+        // }
       
-        // await createForm(data);
+    //    const { studentEmail, ...formData} = data;
+        await createForm(data);
        
-        // alert("Workshop form created successfully!");
+        alert("Workshop form created successfully!");
     };
 
     return(

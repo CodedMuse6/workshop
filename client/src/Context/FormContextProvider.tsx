@@ -22,14 +22,31 @@ const fetchForms = useCallback(async() =>{
 
 const createForm = useCallback(async(form:Omit<WorkshopData, "id" | "linkId" | "createdAt" | "createdBy">) =>{
     if(!user) return;
-    const linkId = generateRandomLink(12);
+    // const linkId = generateRandomLink(12);
+    let linkId = generateRandomLink(12);
+    if(form.status){
+        linkId = generateRandomLink(12);
+    }
+
     await addDoc(collection(db, "workshops"),{
         ...form,
-        status: "off",
+        // status: "off",
         linkId,
         createdBy: user.uid,
         createdAt: Timestamp.now(),
     });
+
+    // if active -> send email
+    if(form.status && linkId){
+    await fetch(import.meta.env.VITE_SEND_LINK_FN!,{
+        method :"POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            email: form.studentEmail,
+            link: `${window.location.origin}/form/${linkId}`,
+        }),
+    });
+}
    await fetchForms();
 },[user,fetchForms]);
 
@@ -42,7 +59,6 @@ const toggleStatus = useCallback(async(formId: string, newStatus: "on" | "off") 
 useEffect(() => {
     if(user) fetchForms();
 }, [user, fetchForms]);
-
 
 return(
     <FormContext.Provider value = {{formData, fetchForms, createForm, toggleStatus }}> 
